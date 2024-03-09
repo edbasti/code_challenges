@@ -21,8 +21,23 @@ FURTHER DETAILS
 
 // Component
 export const CountrySelectOption = (props: OptionProps<any>) => {
+  if (!props) {
+    return;
+  }
+
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+      }}
+    >
+      <img
+        style={{ height: "50px", width: "50px" }}
+        alt="country_flag"
+        src={`https://catamphetamine.gitlab.io/country-flag-icons/3x2/${props.data.value.code}.svg`}
+      />
       <components.Option {...props} />
     </div>
   );

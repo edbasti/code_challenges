@@ -1,8 +1,9 @@
-import React, { useRef } from "react";
+import React, { createContext, useState, useRef } from "react";
 import Modal from "react-modal";
 import CountrySelect, { DEFAULT_COUNTRY } from "../country/CountrySelect";
 import LanguageSelect, { DEFAULT_LANGUAGE } from "../language/LanguageSelect";
 import CurrencySelect, { DEFAULT_CURRENCY } from "../currency/CurrencySelect";
+import { create } from "domain";
 
 /* --- [TASK] ---
 Changes on modal are only applied on SAVE
@@ -93,13 +94,38 @@ FURTHER DETAILS
 - Downgrading to React 17 is not an option 😉
 --- [TASK] --- */
 
+const customStyles = {
+  content: {
+    top: "30%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
+
 // Component
 const SettingsSelector = (): JSX.Element => {
+  const [mainState, setMainState] = useState({
+    country: DEFAULT_COUNTRY,
+    currency: DEFAULT_CURRENCY,
+    language: DEFAULT_LANGUAGE,
+  });
+
+  const [newState, setNewState] = useState({
+    country: DEFAULT_COUNTRY,
+    currency: DEFAULT_CURRENCY,
+    language: DEFAULT_LANGUAGE,
+  });
+
+  const MainContext = createContext({
+    newState,
+    setNewState,
+  });
+
   // States
-  const [modalIsOpen, setModalIsOpen] = React.useState<any>(false);
-  const [selectedCountry, setCountry] = React.useState<any>(DEFAULT_COUNTRY);
-  const [selectedCurrency, setCurrency] = React.useState<any>(DEFAULT_CURRENCY);
-  const [selectedLanguage, setLanguage] = React.useState<any>(DEFAULT_LANGUAGE);
+  const [modalIsOpen, setModalIsOpen] = useState<any>(false);
 
   // Render Counter
   const counter = useRef(0);
@@ -112,6 +138,15 @@ const SettingsSelector = (): JSX.Element => {
     setModalIsOpen(false);
   };
 
+  const handleSave = () => {
+    setMainState({
+      ...mainState,
+      country: newState.country,
+      currency: newState.currency,
+      language: newState.language,
+    });
+  };
+
   const button = () => {
     // Increase render count.
     counter.current++;
@@ -122,7 +157,7 @@ const SettingsSelector = (): JSX.Element => {
     /* Button */
     return (
       <button onClick={handleOpen}>
-        {selectedCountry.name} - ({selectedCurrency} - {selectedLanguage})
+        {mainState.country.name} - ({mainState.currency} - {mainState.language})
       </button>
     );
   };
@@ -133,20 +168,26 @@ const SettingsSelector = (): JSX.Element => {
       {button()}
 
       {/* Modal */}
-      <Modal isOpen={modalIsOpen}>
+      <Modal isOpen={modalIsOpen} style={customStyles}>
         {/* Header */}
         <h2>Select your region, currency and language.</h2>
+        <MainContext.Provider
+          value={{
+            newState,
+            setNewState,
+          }}
+        >
+          {/* Country */}
+          <CountrySelect value={newState.country} onChange={setNewState} />
 
-        {/* Country */}
-        <CountrySelect value={selectedCountry} onChange={setCountry} />
+          {/* Currency */}
+          <CurrencySelect value={newState.currency} onChange={setNewState} />
 
-        {/* Currency */}
-        <CurrencySelect value={selectedCurrency} onChange={setCurrency} />
-
-        {/* Language */}
-        <LanguageSelect language={selectedLanguage} onChange={setLanguage} />
-
+          {/* Language */}
+          <LanguageSelect language={newState.language} onChange={setNewState} />
+        </MainContext.Provider>
         {/* Close button */}
+        <button onClick={handleSave}>Save</button>
         <button onClick={handleClose}>Close</button>
       </Modal>
     </div>
