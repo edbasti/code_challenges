@@ -21,7 +21,7 @@ FURTHER DETAILS
 
 // Component
 export const CountrySelectOption = (props: OptionProps<any>) => {
-  if (!props) {
+  if (!props?.data?.value?.code) {
     return;
   }
 

@@ -1,9 +1,9 @@
-import React, { createContext, useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
+import { MainContext } from "../../provider/main-context";
 import Modal from "react-modal";
 import CountrySelect, { DEFAULT_COUNTRY } from "../country/CountrySelect";
 import LanguageSelect, { DEFAULT_LANGUAGE } from "../language/LanguageSelect";
 import CurrencySelect, { DEFAULT_CURRENCY } from "../currency/CurrencySelect";
-import { create } from "domain";
 
 /* --- [TASK] ---
 Changes on modal are only applied on SAVE
@@ -96,32 +96,29 @@ FURTHER DETAILS
 
 const customStyles = {
   content: {
-    top: "30%",
+    top: "50%",
     left: "50%",
     right: "auto",
     bottom: "auto",
     marginRight: "-50%",
     transform: "translate(-50%, -50%)",
+    padding: "20px",
   },
+};
+
+const elementStyles = {
+  marginTop: "20px",
 };
 
 // Component
 const SettingsSelector = (): JSX.Element => {
+  const context = useContext(MainContext);
+  console.log(context);
+
   const [mainState, setMainState] = useState({
-    country: DEFAULT_COUNTRY,
-    currency: DEFAULT_CURRENCY,
-    language: DEFAULT_LANGUAGE,
-  });
-
-  const [newState, setNewState] = useState({
-    country: DEFAULT_COUNTRY,
-    currency: DEFAULT_CURRENCY,
-    language: DEFAULT_LANGUAGE,
-  });
-
-  const MainContext = createContext({
-    newState,
-    setNewState,
+    country: context?.newState?.country || DEFAULT_COUNTRY,
+    currency: context?.newState?.currency || DEFAULT_CURRENCY,
+    language: context?.newState?.language || DEFAULT_LANGUAGE,
   });
 
   // States
@@ -139,12 +136,18 @@ const SettingsSelector = (): JSX.Element => {
   };
 
   const handleSave = () => {
+    console.log({ main: mainState, new: context?.newState });
+
     setMainState({
       ...mainState,
-      country: newState.country,
-      currency: newState.currency,
-      language: newState.language,
+      country: context?.newState.country!,
+      currency: context?.newState.currency!,
+      language: context?.newState.language!,
     });
+
+    console.log({ main: mainState, new: context?.newState });
+
+    setModalIsOpen(false);
   };
 
   const button = () => {
@@ -157,7 +160,8 @@ const SettingsSelector = (): JSX.Element => {
     /* Button */
     return (
       <button onClick={handleOpen}>
-        {mainState.country.name} - ({mainState.currency} - {mainState.language})
+        {mainState?.country?.name} - ({mainState?.currency} -{" "}
+        {mainState?.language})
       </button>
     );
   };
@@ -166,29 +170,27 @@ const SettingsSelector = (): JSX.Element => {
   return (
     <div>
       {button()}
-
       {/* Modal */}
       <Modal isOpen={modalIsOpen} style={customStyles}>
         {/* Header */}
         <h2>Select your region, currency and language.</h2>
-        <MainContext.Provider
-          value={{
-            newState,
-            setNewState,
-          }}
-        >
-          {/* Country */}
-          <CountrySelect value={newState.country} onChange={setNewState} />
-
-          {/* Currency */}
-          <CurrencySelect value={newState.currency} onChange={setNewState} />
-
-          {/* Language */}
-          <LanguageSelect language={newState.language} onChange={setNewState} />
-        </MainContext.Provider>
+        {/* Country */}
+        <div style={elementStyles}>
+          <CountrySelect />
+        </div>
+        {/* Currency */}
+        <div style={elementStyles}>
+          <CurrencySelect />
+        </div>
+        {/* Language */}
+        <div style={elementStyles}>
+          <LanguageSelect />
+        </div>
         {/* Close button */}
-        <button onClick={handleSave}>Save</button>
-        <button onClick={handleClose}>Close</button>
+        <div style={elementStyles}>
+          <button onClick={handleSave}>Save</button>
+          <button onClick={handleClose}>Close</button>
+        </div>
       </Modal>
     </div>
   );

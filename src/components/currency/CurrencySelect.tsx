@@ -1,5 +1,7 @@
 import CurrencyData from "currency-codes/data";
+import { useContext } from "react";
 import Select from "react-select";
+import { MainContext } from "../../provider/main-context";
 
 // Props
 interface CurrencySelectProps {
@@ -11,11 +13,9 @@ interface CurrencySelectProps {
 export const DEFAULT_CURRENCY = "USD - US Dollar";
 
 // Component
-const CurrencySelect = ({
-  value = DEFAULT_CURRENCY,
-  onChange,
-}: CurrencySelectProps) => {
-  console.log(CurrencyData);
+const CurrencySelect = ({ value = DEFAULT_CURRENCY }: CurrencySelectProps) => {
+  const context = useContext(MainContext);
+
   // Prepare data
   const data = CurrencyData.map(
     ({ code, currency }: { code: string; currency: string }) => {
@@ -25,8 +25,10 @@ const CurrencySelect = ({
       };
     }
   );
-  const defaultValue = { value: value, label: value };
-
+  const defaultValue = {
+    value: context?.newState?.currency,
+    label: context?.newState?.currency,
+  };
   // Render
   return (
     <div>
@@ -36,7 +38,10 @@ const CurrencySelect = ({
           options={data}
           defaultValue={defaultValue}
           onChange={(newValue) => {
-            onChange(newValue.value);
+            context?.setNewState({
+              ...context?.newState,
+              currency: newValue?.value!,
+            });
           }}
         />
       </label>

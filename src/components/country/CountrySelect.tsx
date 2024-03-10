@@ -1,6 +1,7 @@
-import { useState } from "react";
+import React, { useContext } from "react";
 import countries from "i18n-iso-countries";
-import Select, { MultiValue, SingleValue } from "react-select";
+import { MainContext } from "../../provider/main-context";
+import Select from "react-select";
 import { CountrySelectOption } from "./CountrySelectOption";
 
 // Register countries
@@ -13,19 +14,10 @@ interface Country {
   code: string;
   name: string;
 }
-interface CountryOption {
-  value: {
-    code: string;
-    name: string;
-  };
-  label: string;
-}
+
 // Props
-interface CountrySelectProps {
+export interface CountrySelectProps {
   value?: Country;
-  onChange?: (
-    value: MultiValue<CountryOption> | SingleValue<CountryOption>
-  ) => void;
 }
 
 // Constants
@@ -37,8 +29,9 @@ export const DEFAULT_COUNTRY = {
 // Component
 export const CountrySelect = ({
   value = DEFAULT_COUNTRY,
-  onChange,
 }: CountrySelectProps) => {
+  const context = useContext(MainContext);
+
   // Prepare Data
   const data = Object.entries(
     countries.getNames("en", { select: "official" })
@@ -48,11 +41,17 @@ export const CountrySelect = ({
       label: name,
     };
   });
-  const defaultValue = { value: value, label: value.name };
+  const defaultValue = {
+    value: context?.newState?.country,
+    label: context?.newState?.country.name,
+  };
 
   // Render
+  if (!CountrySelectOption) {
+    return;
+  }
   return (
-    <div>
+    <>
       <label>
         Country
         <Select
@@ -60,12 +59,16 @@ export const CountrySelect = ({
           components={{ Option: CountrySelectOption }}
           defaultValue={defaultValue}
           onChange={(newValue) => {
-            console.log(newValue);
-            onChange?.(newValue?.value);
+            console.log({ newVal: newValue?.value });
+            context?.setNewState({
+              ...context?.newState,
+              country: newValue?.value,
+            });
+            console.log(context?.newState);
           }}
         />
       </label>
-    </div>
+    </>
   );
 };
 
