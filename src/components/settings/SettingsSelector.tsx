@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, memo, useMemo } from "react";
 import { MainContext } from "../../provider/main-context";
 import Modal from "react-modal";
 import CountrySelect, { DEFAULT_COUNTRY } from "../country/CountrySelect";
@@ -113,8 +113,6 @@ const elementStyles = {
 // Component
 const SettingsSelector = (): JSX.Element => {
   const context = useContext(MainContext);
-  console.log(context);
-
   const [mainState, setMainState] = useState({
     country: context?.newState?.country || DEFAULT_COUNTRY,
     currency: context?.newState?.currency || DEFAULT_CURRENCY,
@@ -136,8 +134,6 @@ const SettingsSelector = (): JSX.Element => {
   };
 
   const handleSave = () => {
-    console.log({ main: mainState, new: context?.newState });
-
     setMainState({
       ...mainState,
       country: context?.newState.country!,
@@ -145,12 +141,10 @@ const SettingsSelector = (): JSX.Element => {
       language: context?.newState.language!,
     });
 
-    console.log({ main: mainState, new: context?.newState });
-
     setModalIsOpen(false);
   };
 
-  const button = () => {
+  const button = useMemo(() => {
     // Increase render count.
     counter.current++;
 
@@ -164,12 +158,12 @@ const SettingsSelector = (): JSX.Element => {
         {mainState?.language})
       </button>
     );
-  };
+  }, [mainState]);
 
   // Render
   return (
     <div>
-      {button()}
+      {button}
       {/* Modal */}
       <Modal isOpen={modalIsOpen} style={customStyles}>
         {/* Header */}

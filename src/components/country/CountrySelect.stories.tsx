@@ -1,6 +1,6 @@
 import { Meta, StoryFn } from "@storybook/react";
 
-import CountrySelect, { CountrySelectProps } from "./CountrySelect";
+import CountrySelect from "./CountrySelect";
 
 // Settings
 export default {
@@ -12,9 +12,7 @@ export default {
 } as Meta;
 
 // Main Story
-const Template: StoryFn<CountrySelectProps> = (args) => (
-  <CountrySelect {...args} />
-);
+const Template: StoryFn = () => <CountrySelect />;
 
 export const Default = Template.bind({});
 Default.args = {};

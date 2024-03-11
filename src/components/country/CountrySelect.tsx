@@ -9,17 +9,6 @@ countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 
 // --- TASK G ---
 // Please replace "any" with a proper type in this file (and where it is needed).
-
-interface Country {
-  code: string;
-  name: string;
-}
-
-// Props
-export interface CountrySelectProps {
-  value?: Country;
-}
-
 // Constants
 export const DEFAULT_COUNTRY = {
   code: "US",
@@ -27,9 +16,7 @@ export const DEFAULT_COUNTRY = {
 };
 
 // Component
-export const CountrySelect = ({
-  value = DEFAULT_COUNTRY,
-}: CountrySelectProps) => {
+export const CountrySelect = () => {
   const context = useContext(MainContext);
 
   // Prepare Data
@@ -47,24 +34,20 @@ export const CountrySelect = ({
   };
 
   // Render
-  if (!CountrySelectOption) {
-    return;
-  }
   return (
     <>
       <label>
         Country
         <Select
+          isMulti={false}
           options={data}
           components={{ Option: CountrySelectOption }}
           defaultValue={defaultValue}
           onChange={(newValue) => {
-            console.log({ newVal: newValue?.value });
             context?.setNewState({
               ...context?.newState,
-              country: newValue?.value,
+              country: newValue?.value!,
             });
-            console.log(context?.newState);
           }}
         />
       </label>

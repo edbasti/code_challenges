@@ -47,8 +47,6 @@ const LanguageSelect = ({
           options={data}
           defaultValue={defaultValue}
           onChange={(newValue) => {
-            console.log(newValue);
-
             context?.setNewState({
               ...context?.newState,
               language: newValue?.value!,

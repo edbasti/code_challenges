@@ -1,19 +1,12 @@
-import CurrencyData from "currency-codes/data";
 import { useContext } from "react";
 import Select from "react-select";
 import { MainContext } from "../../provider/main-context";
 
-// Props
-interface CurrencySelectProps {
-  value?: string;
-  onChange?: (currency: string) => void;
-}
-
-// Constants
+const CurrencyData = require("currency-codes/data");
 export const DEFAULT_CURRENCY = "USD - US Dollar";
 
 // Component
-const CurrencySelect = ({ value = DEFAULT_CURRENCY }: CurrencySelectProps) => {
+const CurrencySelect = () => {
   const context = useContext(MainContext);
 
   // Prepare data
